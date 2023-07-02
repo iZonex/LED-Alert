@@ -41,7 +41,7 @@ class LedServer:
         """
         logging.debug("Setting radiation color.")
         for i in range(self.number):
-            if i % 3 != 2:
+            if i // 3 % 2 == 0:
                 self.pixels[i] = self.priority_colors[0]
             else:
                 self.pixels[i] = (255, 255, 255)
