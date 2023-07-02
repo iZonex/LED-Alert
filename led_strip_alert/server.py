@@ -20,12 +20,12 @@ class LedServer:
         """
         self.priority_colors: Dict[int, Tuple[int, int, int]] = {
             -1: (0, 0, 0),  # Off (no alerts)
-            0: (255, 0, 0),  # Red for highest priority
-            1: (255, 165, 0),  # Orange
-            2: (255, 255, 0),  # Yellow
-            3: (0, 128, 0),  # Green
-            4: (0, 0, 255),  # Blue
-            5: (128, 0, 128),  # Purple for lowest priority
+            0: (255, 0, 0), # Red (highest priority)
+            1: (255, 51, 20),  
+            2: (255, 102, 40),  
+            3: (255, 153, 60),  
+            4: (255, 204, 80),  
+            5: (255, 255, 100),  # Yellow (lowest priority)
         }
         self.number: int = number
         self.color: Tuple[int, int, int] = (0, 0, 0)
@@ -41,7 +41,7 @@ class LedServer:
         """
         logging.debug("Setting radiation color.")
         for i in range(self.number):
-            if i % 3 == 0:
+            if i % 3 != 2:
                 self.pixels[i] = self.priority_colors[0]
             else:
                 self.pixels[i] = (255, 255, 255)
