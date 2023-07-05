@@ -28,6 +28,7 @@ class LedServer:
             5: (255, 255, 100),  # Yellow (lowest priority)
         }
         self.number: int = number
+        self.priority: int = -1
         self.color: Tuple[int, int, int] = (0, 0, 0)
         self.rad: bool = False
         logging.debug(f"Number of pixels: {self.number}")
@@ -58,13 +59,23 @@ class LedServer:
         self.pixels.fill(self.color)
         self.pixels.show()
 
-    def set_priotiry(self, priotiry: int):
-        if priotiry not in self.priority_colors:
+    def set_priotiry(self, priority: int) -> bool:
+        if self.priority == priority:
+            return False
+            
+        if priority not in self.priority_colors:
             raise ValueError("Invalid priority")
-        self.color = self.priority_colors[priotiry]
+        
+        self.priority = priority
+        self.color = self.priority_colors[priority]
+        return True
 
-    def set_rad(self, rad: bool):
+    def set_rad(self, rad: bool) -> bool:
+        if self.rad == rad:
+            return False
+        
         self.rad = rad
+        return True
 
     def render(self) -> None:
         if self.rad:
@@ -93,10 +104,13 @@ async def set_priority(request):
     except (TypeError, ValueError):
         return web.Response(text="Bad Request", status=400)
 
-    led_alerts.set_priotiry(priority)
-    led_alerts.render()
+    if led_alerts.set_priotiry(priority):
+        led_alerts.render()
+        return web.Response(text="Alert priority updated successfully")
+    
+    return web.Response(text="Alert priority not changed")
 
-    return web.Response(text="Alert priority updated successfully")
+    
 
 
 @routes.post("/api/alerts/rad")
@@ -107,10 +121,11 @@ async def set_radiation(request):
     except (TypeError, ValueError):
         return web.Response(text="Bad Request", status=400)
 
-    led_alerts.set_rad(rad)
-    led_alerts.render()
-
-    return web.Response(text="Alert radiation status updated successfully")
+    if led_alerts.set_rad(rad):
+        led_alerts.render()
+        return web.Response(text="Alert radiation status updated successfully")
+    
+    return web.Response(text="Alert radiation status not changed")
 
 
 app.add_routes(routes)
